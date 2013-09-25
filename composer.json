@@ -1,0 +1,31 @@
+{
+	"name" : "mouf/interop.silex.di",
+	"description" : "This project is a very simple extension to the Silex microframework. It adds to Silex the capability to use any DI container (not only Pimple).",
+	"authors" : [{
+			"name" : "David Négrier",
+			"email" : "d.negrier@thecodingmachine.com",
+			"homepage" : "http://mouf-php.com"
+		}
+	],
+	"keywords" : [
+		"dependency injection",
+		"DI",
+		"IOC",
+		"inversion of control",
+		"framework",
+		"microframework",
+		"silex"
+	],
+	"homepage" : "http://mouf-php.com",
+	"license" : [
+		"MIT"
+	],
+	"require" : {
+		"silex/silex" : "~1.0"
+	},
+	"autoload" : {
+		"psr-0" : {
+			"Mouf" : "src/"
+		}
+	}
+}
