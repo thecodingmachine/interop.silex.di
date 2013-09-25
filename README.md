@@ -56,16 +56,32 @@ When registering your container, you have 2 options:
 
 To preprend your container, use the `registerPrependContainer` method:
 ```php
-$this->container->registerPrependContainer($myContainer);
+$app = new Mouf\Interop\Silex\Application();
+...
+$app->registerPrependContainer($myContainer);
 ```
 
 To use your container has a fallback, use the `registerFallbackContainer` method:
 ```php
-$this->container->registerFallbackContainer($myContainer);
+$app = new Mouf\Interop\Silex\Application();
+...
+$app->registerFallbackContainer($myContainer);
 ```
 
 <div class="alert alert-info"><strong>Note:</strong> you are not limited to one container, you can register as many as you want.</div>
 
+Installation
+------------
+
+This class is distributed as a [Composer package](https://packagist.org/packages/mouf/interop.silex.di):
+
+```
+{
+	require: {
+		"mouf/interop.silex.di" : "~1.0"
+	}
+}
+```
 
 See a working sample
 --------------------
