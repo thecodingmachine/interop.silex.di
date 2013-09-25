@@ -71,3 +71,9 @@ See a working sample
 --------------------
 
 Check out this use case: [creating a Silex controller with the Mouf framework](doc/declaring-a-controller-with-mouf.md)
+
+You are a Symfony 2 user?
+-------------------------
+
+There is a very similar package for Symfony 2 application. It lets you add additional containers to 
+the main Symfony 2 container: [check it out: interop.symfony.di](https://github.com/thecodingmachine/interop.symfony.di)
