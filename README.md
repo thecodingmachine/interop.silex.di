@@ -2,7 +2,9 @@ Silex with Mouf Dependency Injection compatibility
 ==================================================
 
 This project is a very simple extension to the [Silex microframework](http://silex.sensiolabs.org/).
-It adds [Mouf dependency injection](http://mouf-php.com) capability to Silex.
+It contains an `Mouf\Interop\Silex\Application` class that extends the `Silex\Application` class.
+The extended class will let you add additional dependency injection containers (DIC) to Silex' container
+(that is Pimple).
 
 Why?
 ----
@@ -12,77 +14,60 @@ Silex is a microframework. It is designed on top of Pimple, a very simple depend
 Pimple is a nice DIC, but it can become quite verbose as your project grows. And natively, Silex
 has no way to use another DIC (the `Application` class of Silex extends the `Pimple` class).
 
-This project lets you use [Mouf](http://mouf-php.com), a graphical dependency injection framework
+This project lets you add any other dependency injection framework
 directly in your Silex project. Instead of injecting your dependencies by filling the `$app` variable,
-you can use Mouf user interface to declare your instances.
+you can your own container. Instances declared in your container will be accessible using the
+Pimple `$app['my.instance']` syntax.
 
 How?
 ----
 
-The extended `Application` class has only one additonnal method: `registerMoufManager()`. This is
-used to register the Mouf DIC instance into Silex.
+The extended `Application` class has only two additonal methods: 
 
-When this is done, you can access any instance declared in Mouf using the `$app` object, just like you would in
+- `registerPrependContainer()`: if you want your container to have the precedence over Pimple
+- `registerFallbackContainer()`: if you want Pimple to have the precedence over your container
+
+When this is done, you can access any instance declared of your container using the `$app` object, just like you would in
 any Silex project.
 
-Here is a sample about injecting a controller in Pimple.
+Your DI container must respect the [`ContainerInterface` described in this document.](https://github.com/moufmouf/fig-standards/blob/master/proposed/dependency-injection/dependency-injection.md)
 
-- Install this package using Composer.
-- This package depends on Mouf. Once Mouf is downloaded,
-  you need to [install Mouf](http://mouf-php.com/packages/mouf/mouf/doc/installing_mouf.md).
-- Then, declare a simple test controller:
-  ```php
-  <?php
-  namespace Example\Controller;
+Note: your container does not have to explicitly implement the `ContainerInterface` interface (because it is not standard yet),
+but it needs to provide the `get` and `has` methods.
 
-  use Symfony\Component\HttpFoundation\JsonResponse;
+What DI containers can I plug in Silex?
+---------------------------------------
 
-  class TestController
-  {
-  	  private $text;
-  	  public function __construct($text)
-  	  {
-  		  $this->text = $text;
-  	  }
+Out of the box, you can plug these DI containers, because they respect the `ContainerInterface` interface:
 
-  	  public function testAction()
-  	  {
-  		  return new JsonResponse(array("hello"=>$this->text));
-  	  }
-  }
-  ```
-- [Create an instance](http://mouf-php.com/packages/mouf/mouf/version/2.0-dev/doc/mouf_di_ui.md) `mycontroller` for your controller in Mouf.
-  When this is over, you should see this in Mouf UI:  
-  ![Controller's instance](doc/images/mycontroller_instance.png)
-- Init your application using the extended `Mouf\Silex\Application` class:
-  ```php
-  // Load Mouf (and Composer's autoloader)
-  require_once __DIR__.'/mouf/Mouf.php';
+- Mouf (http://mouf-php.com)
+- Aura DI (https://github.com/auraphp/Aura.Di)
+- Symfony 2 DIC (http://symfony.com/doc/current/components/dependency_injection/introduction.html)
 
-  // Get Silex app with Mouf support
-  $app = new Mouf\Silex\Application();
+But wait! Thanks to Jeremy Lindblom and its awesome [Acclimate package](https://github.com/jeremeamia/acclimate), you can now take almost any dependency injection container out there, and get an adapter on that container that respects the `ContainerInterface` interface.
 
-  // Register Silex's controllers support
-  $app->register(new Silex\Provider\ServiceControllerServiceProvider());
+Prepending or appending containers
+----------------------------------
 
-  // Register the Mouf DI container
-  $app->registerMoufManager(Mouf\MoufManager::getMoufManager());
+When registering your container, you have 2 options:
 
-  // 'mycontroller' instance is declared in Mouf!
-  $app->get('/hello', "mycontroller:testAction");
+- You can **preprend** your container. In this case, your container will be called before Symfony's container.
+- You can use your container as a **fallback**. In this case, your container will be called only if Symfony's container does not contain the instance.
 
-  $app->run();  
-  ```
-  
-See how great it is? You can use the simple routing mechanism of Pimple and get rid of all the
-spaguetti code building your dependencies.
+To preprend your container, use the `registerPrependContainer` method:
+```php
+$this->container->registerPrependContainer($myContainer);
+```
+
+To use your container has a fallback, use the `registerFallbackContainer` method:
+```php
+$this->container->registerFallbackContainer($myContainer);
+```
+
+<div class="alert alert-info"><strong>Note:</strong> you are not limited to one container, you can register as many as you want.</div>
 
 
-Known limits
-------------
+See a working sample
+--------------------
 
-This project is a proof-of-concept. It prooves that is it possible to chain 2 DI containers easily (this
-package contains... 10 lines of code!)
-It also shows the limits of this technique. Indeed, it is not possible from Mouf to refer to an
-object declared in Pimple (no possible round-trip). This might however become possible, should a 
-standard about DIC interoperability become true.
+Check out this use case: [creating a Silex controller with the Mouf framework](doc/declaring-a-controller-with-mouf.md)
