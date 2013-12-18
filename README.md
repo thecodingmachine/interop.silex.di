@@ -1,5 +1,5 @@
-Silex with Mouf Dependency Injection compatibility
-==================================================
+Silex with chainable Dependency Injection compatibility
+=======================================================
 
 This project is a very simple extension to the [Silex microframework](http://silex.sensiolabs.org/).
 It contains an `Mouf\Interop\Silex\Application` class that extends the `Silex\Application` class.
@@ -30,7 +30,7 @@ The extended `Application` class has only two additonal methods:
 When this is done, you can access any instance declared of your container using the `$app` object, just like you would in
 any Silex project.
 
-Your DI container must respect the [`ContainerInterface` described in this document.](https://github.com/moufmouf/fig-standards/blob/master/proposed/dependency-injection/dependency-injection.md)
+Your DI container must respect the [`ReadableContainerInterface` described in this the container-interop project.](https://github.com/container-interop/container-interop)
 
 Note: your container does not have to explicitly implement the `ContainerInterface` interface (because it is not standard yet),
 but it needs to provide the `get` and `has` methods.
