@@ -78,7 +78,7 @@ This class is distributed as a [Composer package](https://packagist.org/packages
 ```
 {
 	require: {
-		"mouf/interop.silex.di" : "~1.0"
+		"mouf/interop.silex.di" : "~2.0"
 	}
 }
 ```

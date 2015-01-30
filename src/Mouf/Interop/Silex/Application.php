@@ -1,7 +1,8 @@
 <?php
 namespace Mouf\Interop\Silex;
 
-use Mouf\MoufManager;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Pimple\DelegateLookupContainerAdapter;
 
 /**
  * This class extends the Silex Application class that itself extends Pimple.
@@ -11,99 +12,58 @@ use Mouf\MoufManager;
  * @author David Négrier <david@mouf-php.com>
  */
 class Application extends \Silex\Application {
-	
-	/**
-	 * @var ContainerInterface[]
-	 */
-	protected $prependContainers = array();
 
 	/**
-	 * @var ContainerInterface[]
+	 * @var ContainerInterface
 	 */
-	protected $fallbackContainers = array();
-	
+	protected $delegateLookupContainer;
+
 	/**
-	 * Registers a container that will be queried if the Pimple container does not
-	 * contain the requested instance.
-	 *
-	 * Note: we are not enforcing an interface yet because we lack a standard on the interface name.
-	 *
-	 * @param ContainerInterface $container
+	 * @var DelegateLookupContainerAdapter
 	 */
-	public function registerFallbackContainer($container) {
-		$this->fallbackContainers[] = $container;
-	}
-	
+	protected $wrappedDelegateLookupContainer;
+
 	/**
-	 * Registers a container that will be queried before the Pimple container.
+	 * Instantiate the container.
 	 *
-	 * Note: we are not enforcing an interface yet because we lack a standard on the interface name.
+	 * Objects and parameters can be passed as argument to the constructor.
 	 *
-	 * @param ContainerInterface $container
+	 * @param ContainerInterface $container The root container of the application (if any)
+	 * @param array $values The parameters or objects.
 	 */
-	public function registerPrependContainer($container) {
-		array_unshift($this->prependContainers, $container);
-	}
-	
-	
-	/**
-	 * Checks if a parameter or an object is set.
-	 *
-	 * @param string $id The unique identifier for the parameter or object
-	 *
-	 * @return Boolean
-	 */
-	public function offsetExists($id)
+	public function __construct(ContainerInterface $container = null, array $values = array())
 	{
-		foreach ($this->prependContainers as $container) {
-			if ($container->has($id)) {
-				return true;
-			}
+		parent::__construct($values);
+		if ($container) {
+			$this->delegateLookupContainer = $container;
+			$this->wrappedDelegateLookupContainer = new DelegateLookupContainerAdapter($container, $this);
+		} else {
+			$this->wrappedDelegateLookupContainer = $this;
 		}
-		
-		$has = parent::offsetExists($id);
-		if ($has) {
-			return true;
-		}
-		
-		foreach ($this->fallbackContainers as $container) {
-			if ($container->has($id)) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
-	
+
 	/**
-	 * Gets a parameter or an object, first from Mouf, then if not found from Pimple.
+	 * Gets a parameter or an object, first from Pimple, then from the delegate lookup container if it is set.
 	 *
 	 * @param string $id The unique identifier for the parameter or object
 	 *
 	 * @return mixed The value of the parameter or an object
 	 *
-	 * @throws InvalidArgumentException if the identifier is not defined
+	 * @throws PimpleNotFoundException if the identifier is not defined
 	 */
 	public function offsetGet($id)
 	{
-		// Let's search in the prepended containers:
-		foreach ($this->prependContainers as $container) {
-			if ($container->has($id)) {
-				return $container->get($id);
-			}
+		if (!array_key_exists($id, $this->values)) {
+			throw new PimpleNotFoundException(sprintf('Identifier "%s" is not defined.', $id));
 		}
-		
-		if (parent::offsetExists($id)) {
-			return parent::offsetGet($id);
+		try {
+			$isFactory = is_object($this->values[$id]) && method_exists($this->values[$id], '__invoke');
+
+			return $isFactory ? $this->values[$id]($this->wrappedDelegateLookupContainer) : $this->values[$id];
+		} catch (\InvalidArgumentException $e) {
+			// To respect container-interop, let's wrap the exception.
+			throw new PimpleNotFoundException($e->getMessage(), $e->getCode(), $e);
 		}
-		
-		// Let's search in the fallback mode:
-		foreach ($this->fallbackContainers as $container) {
-			if ($container->has($id)) {
-				return $container->get($id);
-			}
-		}
-		
-		throw new InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
+
 	}
 }
