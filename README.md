@@ -22,53 +22,22 @@ Pimple `$app['my.instance']` syntax.
 How?
 ----
 
-The extended `Application` class has only two additonal methods: 
+The extended `Application` class has a modified constructor:
 
-- `registerPrependContainer()`: if you want your container to have the precedence over Pimple
-- `registerFallbackContainer()`: if you want Pimple to have the precedence over your container
+- __construct(ContainerInterface $container = null, array $values = array())
+
+The container passed in parameter is a [delegate lookup container](https://github.com/container-interop/container-interop/blob/master/docs/Delegate-lookup.md).
 
 When this is done, you can access any instance declared of your container using the `$app` object, just like you would in
 any Silex project.
 
-Your DI container must respect the [`ReadableContainerInterface` described in this the container-interop project.](https://github.com/container-interop/container-interop)
-
-Note: your container does not have to explicitly implement the `ContainerInterface` interface (because it is not standard yet),
-but it needs to provide the `get` and `has` methods.
+Your DI container must respect the [`ContainerInterface` described in this the container-interop project.](https://github.com/container-interop/container-interop)
 
 What DI containers can I plug in Silex?
 ---------------------------------------
 
-Out of the box, you can plug these DI containers, because they respect the `ContainerInterface` interface:
-
-- Mouf (http://mouf-php.com)
-- Aura DI (https://github.com/auraphp/Aura.Di)
-- Symfony 2 DIC (http://symfony.com/doc/current/components/dependency_injection/introduction.html)
-
-But wait! Thanks to Jeremy Lindblom and its awesome [Acclimate package](https://github.com/jeremeamia/acclimate), you can now take almost any dependency injection container out there, and get an adapter on that container that respects the `ContainerInterface` interface.
-
-Prepending or appending containers
-----------------------------------
-
-When registering your container, you have 2 options:
-
-- You can **preprend** your container. In this case, your container will be called before Symfony's container.
-- You can use your container as a **fallback**. In this case, your container will be called only if Symfony's container does not contain the instance.
-
-To preprend your container, use the `registerPrependContainer` method:
-```php
-$app = new Mouf\Interop\Silex\Application();
-...
-$app->registerPrependContainer($myContainer);
-```
-
-To use your container has a fallback, use the `registerFallbackContainer` method:
-```php
-$app = new Mouf\Interop\Silex\Application();
-...
-$app->registerFallbackContainer($myContainer);
-```
-
-<div class="alert alert-info"><strong>Note:</strong> you are not limited to one container, you can register as many as you want.</div>
+Out of the box, you can plug any of the DI containers supported by [container-interop]((https://github.com/container-interop/container-interop)).
+There are an awful lot of them!
 
 Installation
 ------------

@@ -1,6 +1,8 @@
 Integrating Silex with Mouf
 ===========================
 
+TODO: this documentation is adapted to version 1 of interop.silex.di. We should adapt it.
+
 In this example, we are using Silex and the Mouf framework as a container.
 
 How?
@@ -41,13 +43,10 @@ Here is a sample about injecting a controller in Pimple.
   require_once __DIR__.'/mouf/Mouf.php';
 
   // Get Silex app with Mouf support
-  $app = new Mouf\Interop\Silex\Application();
+  $app = new Mouf\Interop\Silex\Application(Mouf\MoufManager::getMoufManager());
 
   // Register Silex's controllers support
   $app->register(new Silex\Provider\ServiceControllerServiceProvider());
-
-  // Register the Mouf DI container
-  $app->registerFallbackContainer(Mouf\MoufManager::getMoufManager());
 
   // 'mycontroller' instance is declared in Mouf!
   $app->get('/hello', "mycontroller:testAction");
@@ -56,4 +55,4 @@ Here is a sample about injecting a controller in Pimple.
   ```
   
 See how great it is? You can use the simple routing mechanism of Pimple and get rid of all the
-spaguetti code building your dependencies.
+spaghetti code building your dependencies.
