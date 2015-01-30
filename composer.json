@@ -21,8 +21,9 @@
 		"MIT"
 	],
 	"require" : {
-		"container-interop/container-interop" : "*",
-		"silex/silex" : "~1.0"
+		"container-interop/container-interop" : "~1.0",
+		"silex/silex" : "~1.0",
+	  	"mouf/pimple-interop" : "~2.0"
 	},
 	"autoload" : {
 		"psr-0" : {
