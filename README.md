@@ -1,10 +1,10 @@
-Silex with chainable Dependency Injection compatibility
-=======================================================
+Run Silex with any Dependency Injection container
+=================================================
 
 This project is a very simple extension to the [Silex microframework](http://silex.sensiolabs.org/).
-It contains an `Mouf\Interop\Silex\Application` class that extends the `Silex\Application` class.
-The extended class will let you add additional dependency injection containers (DIC) to Silex' container
-(that is Pimple).
+It makes Silex able to use any other dependency container compatible with [container-interop](https://github.com/container-interop/container-interop/) (and not only Pimple).
+
+To use this, you simply need to use the `Mouf\Interop\Silex\Application` class that extends the `Silex\Application` class.
 
 Why?
 ----
@@ -16,7 +16,7 @@ has no way to use another DIC (the `Application` class of Silex extends the `Pim
 
 This project lets you add any other dependency injection framework
 directly in your Silex project. Instead of injecting your dependencies by filling the `$app` variable,
-you can your own container. Instances declared in your container will be accessible using the
+you can register entries in your own container. Instances declared in your container will be accessible using the
 Pimple `$app['my.instance']` syntax.
 
 How?

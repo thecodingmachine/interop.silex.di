@@ -1,8 +1,6 @@
 Integrating Silex with Mouf
 ===========================
 
-TODO: this documentation is adapted to version 1 of interop.silex.di. We should adapt it.
-
 In this example, we are using Silex and the Mouf framework as a container.
 
 How?
